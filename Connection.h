@@ -125,7 +125,7 @@ namespace client
 		{
 			if (!err)
 			{
-				//boost::get<0>(handler)(err, m_Response);
+				boost::get<0>(handler)(err, m_Response);//CConnectionPool::QueueConnection
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 
 				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->data(), m_Response->header_length),
@@ -152,7 +152,7 @@ namespace client
 		template <typename Handler>
 		void Handle_Read_Header(const boost::system::error_code &err, boost::tuple<Handler> handler)
 		{
-			if (!err)
+			if (!err && m_Response->decode_header())
 			{
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Body<Handler>;
 

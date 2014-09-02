@@ -139,6 +139,9 @@ namespace client
 		if (cb && msg)
 		{
 			boost::system::error_code error;
+			if (m_DequeValid.empty())
+				error = boost::asio::error::not_connected;
+
 			m_Io_Service.post(boost::bind(cb, error, msg));
 		}
 	}

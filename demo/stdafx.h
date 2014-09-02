@@ -18,7 +18,7 @@
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 
-#pragma comment(lib, "clientd.lib")
+#pragma comment(lib, "client.lib")
 #include "../client.h"
 
 

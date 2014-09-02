@@ -35,11 +35,13 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	return EXIT_SUCCESS;
 }*/
+int times = 0;
 
 void OnReceive(const boost::system::error_code &err, client::CMessage::Ptr msg)
 {
-	std::cout << err.value() << std::endl;
-	std::cout << "the message is " << msg->body() << std::endl;
+	std::cout << "the error code is " << err.value() << std::endl;
+	std::cout << "the message is " << "\"" << msg->body() << "\"" << std::endl;
+	std::cout << "the times is \"" << times++ << "\"" << std::endl;
 }
 
 void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr msg)
@@ -54,12 +56,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		printf ( "Hello, world!\n" );
 
-		std::string host = "192.168.1.186";
-		std::string port = "11211";
+		std::string host = "localhost";
+		std::string port = "60000";
 
 		client::CClient cli;
 
-		cli.Init( host, port, boost::bind(&OnReceive, _1, _2));
+		cli.Init( host, port, boost::bind(&OnReceive, _1, _2), 1, 3);
 
 		while (true)
 		{
