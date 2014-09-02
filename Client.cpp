@@ -1,3 +1,9 @@
+/****************************************
+ * author	: LittleKu (L.K)
+ * email	: kklvzl@gmail.com
+ * date		: 09-02-2014
+ ****************************************/
+
 #include "Client.h"
 
 namespace client

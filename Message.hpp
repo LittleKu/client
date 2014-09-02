@@ -1,5 +1,11 @@
-#ifndef __CHAT_MESSAGE_HPP__
-#define __CHAT_MESSAGE_HPP__
+/****************************************
+ * class	: CMessage
+ * author	: http://www.boost.org/doc/libs/1_56_0/doc/html/boost_asio/example/cpp03/chat/chat_message.hpp
+ * email	: kklvzl@gmail.com
+ * date		: 09-02-2014
+ ****************************************/
+#ifndef __CMESSAGE_HPP__
+#define __CMESSAGE_HPP__
 
 #include <cstdio>
 #include <cstdlib>

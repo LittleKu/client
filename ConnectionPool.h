@@ -1,3 +1,10 @@
+/****************************************
+ * class	: CConnectionPool
+ * author	: LittleKu (L.K)
+ * email	: kklvzl@gmail.com
+ * date		: 09-02-2014
+ ****************************************/
+
 #ifndef __CONNECTION_POOL_H__
 #define __CONNECTION_POOL_H__
 

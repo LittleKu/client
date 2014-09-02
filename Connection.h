@@ -1,3 +1,10 @@
+/****************************************
+ * class	: CConnection
+ * author	: LittleKu (L.K)
+ * email	: kklvzl@gmail.com
+ * date		: 09-02-2014
+ ****************************************/
+
 #ifndef __CONNECTION_H__
 #define __CONNECTION_H__
 
