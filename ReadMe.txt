@@ -7,3 +7,6 @@ client
  *********************************/
 
 a client side connection with boost, include the connection pool
+
+update 2014/11/20
+	fixed reconnect bug

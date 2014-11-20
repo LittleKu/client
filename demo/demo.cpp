@@ -39,9 +39,12 @@ int times = 0;
 
 void OnReceive(const boost::system::error_code &err, client::CMessage::Ptr msg)
 {
-	std::cout << "the error code is " << err.value() << std::endl;
-	std::cout << "the message is " << "\"" << msg->body() << "\"" << std::endl;
-	std::cout << "the times is \"" << times++ << "\"" << std::endl;
+	if (!err)
+	{
+		std::cout << "the error code is " << err.value() << std::endl;
+		std::cout << "the message is " << "\"" << msg->body() << "\"" << std::endl;
+		std::cout << "the times is \"" << times++ << "\"" << std::endl;
+	}
 }
 
 void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr msg)
@@ -57,7 +60,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf ( "Hello, world!\n" );
 
 		std::string host = "localhost";
-		std::string port = "60000";
+		std::string port = "60001";
 
 		client::CClient cli;
 

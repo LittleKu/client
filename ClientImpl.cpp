@@ -54,7 +54,7 @@ namespace client
 		for (size_t i = 0; i < m_ListThread.size(); i++)
 		{
 			/** 
-			 * 确保线程执行完后再退出(make sure all have been finished,then exit the thread)
+			 * 确保线程执行完后再退出
 			 */
 			m_ListThread[i]->join();
 		}
@@ -69,17 +69,17 @@ namespace client
 	{
 		if (connection && !err)
 		{
-			cb_InitConnection cb_Init = NULL;
+			cb_InitConnection NullCB = NULL;
 
 			connection->PostWrite(msg,
 				boost::bind(&CClientImpl::CompleteRequest, shared_from_this(), cb, _1, _2),//
-				boost::bind(&CConnectionPool::QueueConnection, m_pPool, _1, _2, cb_Init, connection));//
+				boost::bind(&CConnectionPool::QueueConnection, m_pPool, _1, _2, _3, NullCB, connection));//
 		}
 		else
 		{
 			if (connection)
 			{
-				m_pPool->QueueConnection(err, msg, NULL, connection);
+				m_pPool->QueueConnection(err, SC_None, msg, NULL, connection);
 			}
 			if (err)
 			{

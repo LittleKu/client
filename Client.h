@@ -27,7 +27,7 @@ namespace client
 		CClient();
 		~CClient();
 
-		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count = 1, int connection_count = 1, int try_count = 1, int connection_limit = 1);
+		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count = 1, int connection_count = 1, int try_count = 1, int connection_limit = 5);
 		void Stop();
 		void PostSend(CMessage::Ptr msg, cb_Request cb);
 
