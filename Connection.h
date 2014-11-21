@@ -55,19 +55,19 @@ namespace client
 		{
 		}
 
-		//¹Ø±ÕÁ¬½Ó
+		//å…³é—­è¿æ¥
 		void Close()
 		{
 			m_Socket.close();
 		}
 
-		//Á¬½ÓÊÇ·ñÒÑ¾­´ò¿ª
+		//è¿æ¥æ˜¯å¦å·²ç»æ‰“å¼€
 		bool IsOpen() const
 		{
 			return m_Socket.is_open();
 		}
 
-		//Í¶µİÒ»¸ö·¢ËÍĞÅÏ¢µÄÇëÇó
+		//æŠ•é€’ä¸€ä¸ªå‘é€ä¿¡æ¯çš„è¯·æ±‚
 		template <typename Handler>
 		void PostWrite(CMessage::Ptr msg, boost::function2<void, const boost::system::error_code &, CMessage::Ptr> cb, Handler handler)
 		{
@@ -82,21 +82,8 @@ namespace client
 					boost::bind(f, shared_from_this(), boost::asio::placeholders::error, msg, cb, boost::make_tuple(handler)));
 			}
 		}
-		
-		//´¦ÀíÍ¶µİ·¢ËÍĞÅÏ¢µÄÇëÇó½á¹û
-		template <typename Handler>
-		void Handle_Write(const boost::system::error_code &err, CMessage::Ptr msg, 
-			boost::function2<void, const boost::system::error_code &, CMessage::Ptr>cb, boost::tuple<Handler> handler)
-		{
-			//CClientImpl::CompleteRequest
-			cb(err, msg);
-			
-			//CConnectionPool::QueueConnection
-			//»ØÊÕconnection
-			boost::get<0>(handler)(err, SC_Send, msg);
-		}
 
-		//³¢ÊÔÁ¬½ÓÖ¸¶¨IPÓë¶Ë¿ÚµÄ·şÎñÆ÷
+		//å°è¯•è¿æ¥æŒ‡å®šIPä¸ç«¯å£çš„æœåŠ¡å™¨
 		template <typename Handler>
 		void Connect(std::string host, std::string port, Handler handler)
 		{
@@ -132,15 +119,15 @@ namespace client
 
 			if (!err)
 			{
-				//Î´³öÏÖ´íÎó,Ö±½Ó³¢ÊÔÒì²½Á¬½Ó
+				//æœªå‡ºç°é”™è¯¯,ç›´æ¥å°è¯•å¼‚æ­¥è¿æ¥
 				boost::asio::ip::tcp::endpoint endpoint = *endpoint_iterator;
 				m_Socket.async_connect(endpoint,
 					boost::bind(f, shared_from_this(), boost::asio::placeholders::error, ++endpoint_iterator, handler));
 			}
 			else
 			{
-				//ÉèÖÃÁ¬½Ó·½°¸³ö´í,Èç¹ûÊ¹ÓÃÁ¬½Ó³ØÄ£Ê½Ê±,´ËÊ±Ö±½Óµ÷ÓÃCConnectionPool::QueueConnection,²¢´«µİ´íÎó´úÂë
-				//Èç¹ûÊÇÖ±½ÓÊ¹ÓÃµ¥Ò»µÄConnectionµÄ,´ËÊ±Ö±½Óµ÷ÓÃÓÃ»§×Ô¶¨ÒåµÄ»Øµ÷º¯Êı,²¢´«µİ´íÎó´úÂë
+				//è®¾ç½®è¿æ¥æ–¹æ¡ˆå‡ºé”™,å¦‚æœä½¿ç”¨è¿æ¥æ± æ¨¡å¼æ—¶,æ­¤æ—¶ç›´æ¥è°ƒç”¨CConnectionPool::QueueConnection,å¹¶ä¼ é€’é”™è¯¯ä»£ç 
+				//å¦‚æœæ˜¯ç›´æ¥ä½¿ç”¨å•ä¸€çš„Connectionçš„,æ­¤æ—¶ç›´æ¥è°ƒç”¨ç”¨æˆ·è‡ªå®šä¹‰çš„å›è°ƒå‡½æ•°,å¹¶ä¼ é€’é”™è¯¯ä»£ç 
 				boost::get<0>(handler)(err, SC_Resolve, m_Response);
 			}
 		}
@@ -150,22 +137,22 @@ namespace client
 		{
 			if (!err)
 			{
-				//Òì²½Á¬½Ó³É¹¦,Èç¹ûÊ¹ÓÃÁ¬½Ó³ØÄ£Ê½Ê±,Í¨ÖªCConnectionPool::QueueConnection²¢´«µİ´íÎó´úÂë(µ±È»´ËÊ±µÄ´íÎó´úÂë¿Ï¶¨Îª0)ÓëÏìÓ¦µÄÊı¾İ°ü(µ±È»´ËÊ±Êı¾İ°üÒ²Ö»ÊÇ¸ö¿ÕµÄÊı¾İ°ü
-				//ÒòÎªÎÒÃÇ»¹Î´¿ªÊ¼½ÓÊÕÊı¾İ,¿ÉÒÔÍ¨¹ıÅĞ¶ÏresponseµÄdataÊÇ·ñÎª¿Õ¾Í¿ÉÒÔµÃ)
+				//å¼‚æ­¥è¿æ¥æˆåŠŸ,å¦‚æœä½¿ç”¨è¿æ¥æ± æ¨¡å¼æ—¶,é€šçŸ¥CConnectionPool::QueueConnectionå¹¶ä¼ é€’é”™è¯¯ä»£ç (å½“ç„¶æ­¤æ—¶çš„é”™è¯¯ä»£ç è‚¯å®šä¸º0)ä¸å“åº”çš„æ•°æ®åŒ…(å½“ç„¶æ­¤æ—¶æ•°æ®åŒ…ä¹Ÿåªæ˜¯ä¸ªç©ºçš„æ•°æ®åŒ…
+				//å› ä¸ºæˆ‘ä»¬è¿˜æœªå¼€å§‹æ¥æ”¶æ•°æ®,å¯ä»¥é€šè¿‡åˆ¤æ–­responseçš„dataæ˜¯å¦ä¸ºç©ºå°±å¯ä»¥å¾—)
 				boost::get<0>(handler)(err, SC_Connect, m_Response);
 				
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 				
-				//Í¶µİ header_length(4) ×Ö½Ú´óĞ¡³¢ÊÔ½ÓÊÕÊı¾İ°üÍ·²¿
+				//æŠ•é€’ header_length(4) å­—èŠ‚å¤§å°å°è¯•æ¥æ”¶æ•°æ®åŒ…å¤´éƒ¨
 				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->data(), m_Response->header_length),
 					boost::bind(f, shared_from_this(), 
 					boost::asio::placeholders::error, handler));
 			}
 			else if (endpoint_iterator != boost::asio::ip::tcp::resolver::iterator())
 			{
-				//Á¬½Ó³ö´í?ÄÇÃ´³¢ÊÔ´Ó´´½¨µÄÁ¬½Ó·½°¸ÖĞÑ¡ÔñÏÂÒ»¸öÈç¹û»¹ÓĞµÃÑ¡ÔñµÄ»°,²¢³¢ÊÔÔÙ´ÎÁ¬½Ó
+				//è¿æ¥å‡ºé”™?é‚£ä¹ˆå°è¯•ä»åˆ›å»ºçš„è¿æ¥æ–¹æ¡ˆä¸­é€‰æ‹©ä¸‹ä¸€ä¸ªå¦‚æœè¿˜æœ‰å¾—é€‰æ‹©çš„è¯,å¹¶å°è¯•å†æ¬¡è¿æ¥
 				void (CConnection::*f)(const boost::system::error_code &, boost::asio::ip::tcp::resolver::iterator, boost::tuple<Handler>) = &CConnection::Handle_Connect<Handler>;
-				//ÔÙ´ÎÁ¬½ÓÇ°,ÏÈ°ÑÌ×½Ó×Ö¹Ø±Õ
+				//å†æ¬¡è¿æ¥å‰,å…ˆæŠŠå¥—æ¥å­—å…³é—­
 				m_Socket.close();
 
 				boost::asio::ip::tcp::endpoint endpoint = *endpoint_iterator;
@@ -175,7 +162,7 @@ namespace client
 			}
 			else
 			{
-				//ÎŞÂ·¿É×ß,Ö±½Ó±¨´í°É,Á¬½Ó³ØÍ¨ÖªCConnectionPool::QueueConnection,·ÇÁ¬½Ó³ØÍ¨Öª×Ô¶¨Òå»Øµ÷º¯Êı
+				//æ— è·¯å¯èµ°,ç›´æ¥æŠ¥é”™å§,è¿æ¥æ± é€šçŸ¥CConnectionPool::QueueConnection,éè¿æ¥æ± é€šçŸ¥è‡ªå®šä¹‰å›è°ƒå‡½æ•°
 				boost::get<0>(handler)(err, SC_Connect, m_Response);
 			}
 		}
@@ -183,17 +170,17 @@ namespace client
 		template <typename Handler>
 		void Handle_Read_Header(const boost::system::error_code &err, boost::tuple<Handler> handler)
 		{
-			//Õı³£½ÓÊÕµ½Êı¾İ,²¢ÇÒÄÜÕıÈ·×ª»»ÎªÊı¾İ°üÍ·²¿Êı¾İ
+			//æ­£å¸¸æ¥æ”¶åˆ°æ•°æ®,å¹¶ä¸”èƒ½æ­£ç¡®è½¬æ¢ä¸ºæ•°æ®åŒ…å¤´éƒ¨æ•°æ®
 			if (!err && m_Response->decode_header())
 			{
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Body<Handler>;
-				//¸ù¾İ½âÃÜµÃµ½µÄÊı¾İ°ü´óĞ¡Í¶µİ½ÓÊÕÊı¾İ°ü
+				//æ ¹æ®è§£å¯†å¾—åˆ°çš„æ•°æ®åŒ…å¤§å°æŠ•é€’æ¥æ”¶æ•°æ®åŒ…
 				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->body(), m_Response->body_length()),
 					boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
 			}
 			else
 			{
-				//±¨´í,Á¬½Ó³ØÍ¨ÖªCConnectionPool::QueueConnection,·ÇÁ¬½Ó³ØÍ¨Öª×Ô¶¨Òå»Øµ÷º¯Êı
+				//æŠ¥é”™,è¿æ¥æ± é€šçŸ¥CConnectionPool::QueueConnection,éè¿æ¥æ± é€šçŸ¥è‡ªå®šä¹‰å›è°ƒå‡½æ•°
 				boost::get<0>(handler)(err, SC_ReadHeader, m_Response);
 				std::cout<< err.message() << std::endl;
 			}
@@ -204,22 +191,35 @@ namespace client
 		{
 			if (!err)
 			{
-				//µ½Õâ²½ÎªÖ¹,ÒÑ¾­½ÓÊÕµ½Ò»¸öÍêÕûµÄÊı¾İ°ü,ËùÒÔ´ËÊ±¿ÉÒÔÍ¨Öª»Øµ÷º¯Êı,ÏµÍ³ÒÑ¾­ÍêÕûÒ»¸öÊı¾İ°üµÄ½ÓÊÕ
-				//Á¬½Ó³ØÍ¨ÖªCConnectionPool::QueueConnection,·ÇÁ¬½Ó³ØÍ¨Öª×Ô¶¨Òå»Øµ÷º¯Êı
+				//åˆ°è¿™æ­¥ä¸ºæ­¢,å·²ç»æ¥æ”¶åˆ°ä¸€ä¸ªå®Œæ•´çš„æ•°æ®åŒ…,æ‰€ä»¥æ­¤æ—¶å¯ä»¥é€šçŸ¥å›è°ƒå‡½æ•°,ç³»ç»Ÿå·²ç»å®Œæ•´ä¸€ä¸ªæ•°æ®åŒ…çš„æ¥æ”¶
+				//è¿æ¥æ± é€šçŸ¥CConnectionPool::QueueConnection,éè¿æ¥æ± é€šçŸ¥è‡ªå®šä¹‰å›è°ƒå‡½æ•°
 				boost::get<0>(handler)(err, SC_ReadBody, m_Response);
 
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 
-				//½ÓÊÕÍêÒ»¸öÊı¾İ°üºó,µ±È»µÃ¼ÌĞøÍ¶µİ,½ÓÊÕÒ»ÏÂ¸öÊı¾İ°üÈç´ËÎŞÏŞÑ­»·
+				//æ¥æ”¶å®Œä¸€ä¸ªæ•°æ®åŒ…å,å½“ç„¶å¾—ç»§ç»­æŠ•é€’,æ¥æ”¶ä¸€ä¸‹ä¸ªæ•°æ®åŒ…å¦‚æ­¤æ— é™å¾ªç¯
 				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->data(), m_Response->header_length),
 					boost::bind(f, shared_from_this(), 
 					boost::asio::placeholders::error, handler));
 			}
 			else
 			{
-				//±¨´í,Á¬½Ó³ØÍ¨ÖªCConnectionPool::QueueConnection,·ÇÁ¬½Ó³ØÍ¨Öª×Ô¶¨Òå»Øµ÷º¯Êı
+				//æŠ¥é”™,è¿æ¥æ± é€šçŸ¥CConnectionPool::QueueConnection,éè¿æ¥æ± é€šçŸ¥è‡ªå®šä¹‰å›è°ƒå‡½æ•°
 				boost::get<0>(handler)(err, SC_ReadBody, m_Response);
 			}
+		}
+		
+		//å¤„ç†æŠ•é€’å‘é€ä¿¡æ¯çš„è¯·æ±‚ç»“æœ
+		template <typename Handler>
+		void Handle_Write(const boost::system::error_code &err, CMessage::Ptr msg, 
+			boost::function2<void, const boost::system::error_code &, CMessage::Ptr>cb, boost::tuple<Handler> handler)
+		{
+			//CClientImpl::CompleteRequest
+			cb(err, msg);
+			
+			//CConnectionPool::QueueConnection
+			//å›æ”¶connection
+			boost::get<0>(handler)(err, SC_Send, msg);
 		}
 	};
 }
