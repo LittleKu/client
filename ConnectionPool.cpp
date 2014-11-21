@@ -8,6 +8,7 @@
 
 namespace client
 {
+	//构造
 	CConnectionPool::CConnectionPool(boost::asio::io_service &io_service)
 		:m_Host(""),
 		m_Port(""),
@@ -23,16 +24,19 @@ namespace client
 		m_TimeoutConnect = 2;
 	}
 
+	//虚构
 	CConnectionPool::~CConnectionPool()
 	{
 	}
 
 	void CConnectionPool::Init(const std::string &host, const std::string &port, cb_InitConnection cb, int connection_count /*= 5*/, int connection_limit /*= 1*/)
 	{
+		//保存必要的信息
 		m_Host = host;
 		m_Port = port;
 		m_nConnectionLimit = connection_limit;
 		
+		//创建连接(池)
 		for (int i = 0; i < connection_count; i++)
 		{
 			NewConnection(cb);
@@ -43,8 +47,10 @@ namespace client
 	{
 		boost::mutex::scoped_lock lock(m_Mutex);
 		
+		//标识客户端已经自动放弃与服务端连接
 		m_bIsStop = true;
 
+		//把所有有效的空闲的连接全部关闭
 		while (!m_ListValid.empty())
 		{
 			CConnection::Ptr connection = m_ListValid.front();
@@ -52,6 +58,7 @@ namespace client
 			m_ListValid.pop_front();
 		}
 
+		//把正在运行中的连接全部关闭
 		while (!m_ListRun.empty())
 		{
 			CConnection::Ptr connection = m_ListRun.front();
@@ -59,6 +66,7 @@ namespace client
 			m_ListRun.pop_front();
 		}
 
+		//把新建的连接全部关闭
 		while (!m_ListNew.empty())
 		{
 			CConnection::Ptr connection = m_ListNew.front();
@@ -66,16 +74,19 @@ namespace client
 			m_ListNew.pop_front();
 		}
 
+		//关闭所有定时器
 		m_TryTimer.cancel();
 		m_TryTimerConnect.cancel();
 
+		//清除所有待发送队列
 		while (!m_DequeRequest.empty())
 		{
 			CConnection::Ptr connection;
 			cb_addConnection cb = m_DequeRequest.front();
 			m_DequeRequest.pop_front();
 			boost::system::error_code error(boost::asio::error::not_connected);
-			cb(error, connection);
+			//对于未发送完成的信息,可以根据实际情况在实例中处理
+			cb(error, connection);//比如在Demo中的OnSendComplete
 		}
 	}
 
@@ -85,6 +96,8 @@ namespace client
 		if (m_bIsStop)
 			return;
 
+		boost::mutex::scoped_lock lock(m_Mutex);
+		
 		//申请新的连接对象,并尝试与服务器连接,并当连接成功时等待服务数据包的到来
 		CConnection::Ptr connection(new CConnection(m_Io_Service));
 		connection->Connect(m_Host, m_Port, boost::bind(&CConnectionPool::QueueConnection, shared_from_this(), _1, _2, _3, cb, connection));
@@ -92,7 +105,6 @@ namespace client
 		m_ListNew.push_back(connection);
 
 		//创建连接的基数加1
-		boost::mutex::scoped_lock lock(m_Mutex);
 		m_nConnectionCount++;
 	}
 
@@ -174,6 +186,7 @@ namespace client
 			m_DequeRequest.pop_front();
 
 			boost::system::error_code error;
+			//当使用整体框架时,此处的回调CClientImpl::ProcessRequest,如果单使用CConnection,此处回调为用户自己的实例
 			m_Io_Service.post(boost::bind(pCb, error, pConnection));
 		}
 

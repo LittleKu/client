@@ -57,7 +57,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf ( "Hello, world!\n" );
 
 		std::string host = "localhost";
-		std::string port = "60001";
+		std::string port = "60000";
 
 		client::CClient cli;
 

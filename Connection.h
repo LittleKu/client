@@ -55,16 +55,19 @@ namespace client
 		{
 		}
 
+		//关闭连接
 		void Close()
 		{
 			m_Socket.close();
 		}
 
+		//连接是否已经打开
 		bool IsOpen() const
 		{
 			return m_Socket.is_open();
 		}
 
+		//投递一个发送信息的请求
 		template <typename Handler>
 		void PostWrite(CMessage::Ptr msg, boost::function2<void, const boost::system::error_code &, CMessage::Ptr> cb, Handler handler)
 		{
@@ -80,6 +83,7 @@ namespace client
 			}
 		}
 		
+		//处理投递发送信息的请求结果
 		template <typename Handler>
 		void Handle_Write(const boost::system::error_code &err, CMessage::Ptr msg, 
 			boost::function2<void, const boost::system::error_code &, CMessage::Ptr>cb, boost::tuple<Handler> handler)
@@ -92,6 +96,7 @@ namespace client
 			boost::get<0>(handler)(err, SC_Send, msg);
 		}
 
+		//尝试连接指定IP与端口的服务器
 		template <typename Handler>
 		void Connect(std::string host, std::string port, Handler handler)
 		{
