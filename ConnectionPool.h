@@ -26,7 +26,7 @@ namespace client
 {
 	class CClientImpl;
 
-	typedef boost::function2<void, const boost::system::error_code &, CMessage::Ptr> cb_InitConnection;
+	typedef boost::function3<void, const boost::system::error_code &, StatusCode, CMessage::Ptr> cb_InitConnection;
 	typedef boost::function2<void, const boost::system::error_code &, CConnection::Ptr> cb_addConnection;
 
 	class CConnectionPool
@@ -41,7 +41,7 @@ namespace client
 		CConnectionPool(boost::asio::io_service &io_service);
 		~CConnectionPool();
 
-		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int connection_count, int try_count, int connection_limit);
+		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int connection_count, int connection_limit);
 		void Stop();
 		void GetConnection(cb_addConnection cb);
 	private:
@@ -58,7 +58,7 @@ namespace client
 		boost::asio::io_service &m_Io_Service;
 
 		std::list<CConnection::Ptr> m_ListNew;
-		std::deque<CConnection::Ptr> m_DequeValid;
+		std::list<CConnection::Ptr> m_ListValid;
 		std::list<CConnection::Ptr> m_ListRun;
 		std::deque<cb_addConnection> m_DequeRequest;
 
@@ -68,7 +68,6 @@ namespace client
 		boost::asio::deadline_timer m_TryTimer;
 		boost::asio::deadline_timer m_TryTimerConnect;
 		int m_TryConnect;
-		int m_TryCount;
 		int m_TimeoutRequest;
 		int m_TimeoutConnect;
 	};

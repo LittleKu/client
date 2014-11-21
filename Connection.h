@@ -190,6 +190,7 @@ namespace client
 			{
 				//报错,连接池通知CConnectionPool::QueueConnection,非连接池通知自定义回调函数
 				boost::get<0>(handler)(err, SC_ReadHeader, m_Response);
+				std::cout<< err.message() << std::endl;
 			}
 		}
 

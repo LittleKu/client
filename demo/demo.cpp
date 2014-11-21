@@ -37,14 +37,11 @@ int _tmain(int argc, _TCHAR* argv[])
 }*/
 int times = 0;
 
-void OnReceive(const boost::system::error_code &err, client::CMessage::Ptr msg)
+void OnReceive(const boost::system::error_code &err, client::StatusCode sc, client::CMessage::Ptr msg)
 {
-	if (!err)
-	{
-		std::cout << "the error code is " << err.value() << std::endl;
-		std::cout << "the message is " << "\"" << msg->body() << "\"" << std::endl;
-		std::cout << "the times is \"" << times++ << "\"" << std::endl;
-	}
+	std::cout << "the error code is " << err.value() << std::endl;
+	std::cout << "the message is " << "\"" << msg->body() << "\"" << std::endl;
+	std::cout << "the times is \"" << times++ << "\"" << std::endl;
 }
 
 void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr msg)
@@ -64,7 +61,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		client::CClient cli;
 
-		cli.Init( host, port, boost::bind(&OnReceive, _1, _2), 1, 3);
+		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 3);
 
 		while (true)
 		{

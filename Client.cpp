@@ -17,9 +17,9 @@ namespace client
 	{
 	}
 
-	void CClient::Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count/* = 1*/, int connection_count/* = 5*/, int try_count/* = 1*/, int connection_limit/* = 1*/)
+	void CClient::Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count/* = 1*/, int connection_count/* = 5*/, int connection_limit/* = 1*/)
 	{
-		m_pClientImpl->Init(host, port, cb, thread_count, connection_count, try_count, connection_limit);
+		m_pClientImpl->Init(host, port, cb, thread_count, connection_count, connection_limit);
 	}
 
 	void CClient::Stop()

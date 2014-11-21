@@ -19,7 +19,6 @@ namespace client
 		m_bIsStop = false;
 		m_nConnectionLimit = 10;
 		m_TryConnect = 0;
-		m_TryCount = 0;
 		m_TimeoutRequest = 5;
 		m_TimeoutConnect = 2;
 	}
@@ -28,11 +27,10 @@ namespace client
 	{
 	}
 
-	void CConnectionPool::Init(const std::string &host, const std::string &port, cb_InitConnection cb, int connection_count /*= 5*/, int try_count /*= 1*/, int connection_limit /*= 1*/)
+	void CConnectionPool::Init(const std::string &host, const std::string &port, cb_InitConnection cb, int connection_count /*= 5*/, int connection_limit /*= 1*/)
 	{
 		m_Host = host;
 		m_Port = port;
-		m_TryCount = try_count;
 		m_nConnectionLimit = connection_limit;
 		
 		for (int i = 0; i < connection_count; i++)
@@ -47,11 +45,11 @@ namespace client
 		
 		m_bIsStop = true;
 
-		while (!m_DequeValid.empty())
+		while (!m_ListValid.empty())
 		{
-			CConnection::Ptr connection = m_DequeValid.front();
+			CConnection::Ptr connection = m_ListValid.front();
 			connection->Close();
-			m_DequeValid.pop_front();
+			m_ListValid.pop_front();
 		}
 
 		while (!m_ListRun.empty())
@@ -129,18 +127,20 @@ namespace client
 			if (connection->IsOpen() && !err)
 			{
 				//将没有问题的连接对象存入等待使用的列表中,以备随时取出使用
-				m_DequeValid.push_back(connection);
+				m_ListValid.push_back(connection);
 			}
 			//状态有异常或者有错误时
 			else
 			{
+				//从有效的连接列表中移除
+				m_ListValid.remove(connection);
 				//查看有效的连接数+正在运行的连接数+新建的连接数是否小于系统设定的最小连接数
-				if ( (m_DequeValid.size() + m_ListRun.size() + m_ListNew.size() ) < (size_t)m_nConnectionLimit)
+				if ( (m_ListValid.size() + m_ListRun.size() + m_ListNew.size() ) < (size_t)m_nConnectionLimit)
 				{
 					//尝试继续连接的基数加1
-					m_TryCount++;
+					m_TryConnect++;
 					//当尝试连接的基数小于3时
-					if (m_TryCount < 3)
+					if (m_TryConnect < 3)
 					{
 						//系统继续重新再创建新的连接
 						m_Io_Service.post(boost::bind(&CConnectionPool::NewConnection, shared_from_this(), cb));
@@ -160,11 +160,11 @@ namespace client
 		}
 
 		//有效的连接对象池中不为空,并且请求队列中有等待发送的数据
-		if (!m_DequeValid.empty() && !m_DequeRequest.empty())
+		if (!m_ListValid.empty() && !m_DequeRequest.empty())
 		{
 			//从有效的连接对象池中取出一个可用的连接对象
-			CConnection::Ptr pConnection = m_DequeValid.front();
-			m_DequeValid.pop_front();
+			CConnection::Ptr pConnection = m_ListValid.front();
+			m_ListValid.pop_front();
 
 			//把这个有效的连接对象存入正在使用的连接对象池中
 			m_ListRun.push_back(pConnection);
@@ -179,21 +179,27 @@ namespace client
 
 		if (cb && msg)
 		{
-			boost::system::error_code error;
-			if (m_DequeValid.empty())
+			if (m_ListValid.empty())
+			{
+				boost::system::error_code error;
 				error = boost::asio::error::not_connected;
-
-			m_Io_Service.post(boost::bind(cb, error, msg));
+				m_Io_Service.post(boost::bind(cb, error, sc, msg));
+			}
+			else
+			{
+				m_Io_Service.post(boost::bind(cb, err, sc, msg));
+			}
 		}
 	}
 
 	void CConnectionPool::GetConnection(cb_addConnection cb)
 	{
 		boost::mutex::scoped_lock lock(m_Mutex);
-		if (!m_DequeValid.empty())
+		if (!m_ListValid.empty())
 		{
-			CConnection::Ptr connection = m_DequeValid.front();
-			m_DequeValid.pop_front();
+			CConnection::Ptr connection = m_ListValid.front();
+			m_ListValid.pop_front();
+			
 			m_ListRun.push_back(connection);
 			boost::system::error_code error;
 			m_Io_Service.post(boost::bind(cb, error, connection));
@@ -226,10 +232,10 @@ namespace client
 			cb_addConnection cb = m_DequeRequest.front();
 			m_DequeRequest.pop_front();
 
-			if (!m_DequeValid.empty())
+			if (!m_ListValid.empty())
 			{
-				connection = m_DequeValid.front();
-				m_DequeValid.pop_front();
+				connection = m_ListValid.front();
+				m_ListValid.pop_front();
 				m_ListRun.push_back(connection);
 			}
 			else

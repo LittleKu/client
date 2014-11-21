@@ -34,7 +34,7 @@ namespace client
 		CClientImpl();
 		~CClientImpl();
 
-		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count, int connection_count, int try_count, int connection_limit);
+		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count, int connection_count, int connection_limit);
 		void Stop();
 		void PostRequest(CMessage::Ptr msg, cb_Request cb);
 
