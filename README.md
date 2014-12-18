@@ -1,10 +1,16 @@
 client
 
 /****************************************
+
 	author	: LittleKu (L.K)
+
 	email	: kklvzl@gmail.com
+
 	date	: 2014/09/02
+
  ****************************************/
+
+Credit:Nagist
 
 a client side connection with boost, include the connection pool
 
