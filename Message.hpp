@@ -223,7 +223,7 @@ namespace client
 		}
 
 	private:
-		char m_rgData[header_length + max_body_length];
+		unsigned char m_rgData[header_length + max_body_length];
 		size_t m_nBodyLength;
 		size_t m_nCursor;
 	private:
