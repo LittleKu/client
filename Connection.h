@@ -71,14 +71,14 @@ namespace client
 		template <typename Handler>
 		void PostWrite(CMessage::Ptr msg, boost::function2<void, const boost::system::error_code &, CMessage::Ptr> cb, Handler handler)
 		{
-			if (msg->data())
+			if (msg->GetData())
 			{
 				void (CConnection::*f)(const boost::system::error_code &,
 					CMessage::Ptr,
 					boost::function2<void, const boost::system::error_code &, CMessage::Ptr>,
 					boost::tuple<Handler>) = &CConnection::Handle_Write<Handler>;
 
-				boost::asio::async_write(m_Socket, boost::asio::buffer(msg->data(), msg->length()),
+				boost::asio::async_write(m_Socket, boost::asio::buffer(msg->GetData(), msg->GetLength()),
 					boost::bind(f, shared_from_this(), boost::asio::placeholders::error, msg, cb, boost::make_tuple(handler)));
 			}
 		}
@@ -144,7 +144,7 @@ namespace client
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 				
 				//投递 header_length(4) 字节大小尝试接收数据包头部
-				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->data(), m_Response->header_length),
+				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->GetData(true), m_Response->header_length),
 					boost::bind(f, shared_from_this(), 
 					boost::asio::placeholders::error, handler));
 			}
@@ -171,11 +171,11 @@ namespace client
 		void Handle_Read_Header(const boost::system::error_code &err, boost::tuple<Handler> handler)
 		{
 			//正常接收到数据,并且能正确转换为数据包头部数据
-			if (!err && m_Response->decode_header())
+			if (!err && m_Response->DecodeHeader())
 			{
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Body<Handler>;
 				//根据解密得到的数据包大小投递接收数据包
-				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->body(), m_Response->body_length()),
+				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->GetBody(), m_Response->GetBodyLength()),
 					boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
 			}
 			else
@@ -193,12 +193,17 @@ namespace client
 			{
 				//到这步为止,已经接收到一个完整的数据包,所以此时可以通知回调函数,系统已经完整一个数据包的接收
 				//连接池通知CConnectionPool::QueueConnection,非连接池通知自定义回调函数
-				boost::get<0>(handler)(err, SC_ReadBody, m_Response);
+				CMessage::Ptr pMsg;
+				pMsg.reset(new CMessage());
+				::memcpy(pMsg->GetData(true), m_Response->GetData(), m_Response->GetLength());
+				pMsg->SetBodyLength(m_Response->GetBodyLength());
+
+				boost::get<0>(handler)(err, SC_ReadBody, pMsg);
 
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 
 				//接收完一个数据包后,当然得继续投递,接收一下个数据包如此无限循环
-				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->data(), m_Response->header_length),
+				boost::asio::async_read(m_Socket, boost::asio::buffer(m_Response->GetData(true), m_Response->header_length),
 					boost::bind(f, shared_from_this(), 
 					boost::asio::placeholders::error, handler));
 			}

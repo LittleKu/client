@@ -36,19 +36,48 @@ int _tmain(int argc, _TCHAR* argv[])
 	return EXIT_SUCCESS;
 }*/
 int times = 0;
-
-void OnReceive(const boost::system::error_code &err, client::StatusCode sc, client::CMessage::Ptr msg)
-{
-	std::cout << "the error code is " << err.value() << std::endl;
-	std::cout << "the message is " << "\"" << msg->body() << "\"" << std::endl;
-	std::cout << "the times is \"" << times++ << "\"" << std::endl;
-}
+client::CClient cli;
 
 void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr msg)
 {
 	std::cout << err.value() << std::endl;
-	std::cout << "OnSendComplete" << msg->body() << std::endl;
+	std::cout << "OnSendComplete" << std::endl;
+	std::cout << "OnSendComplete times \"" << times++ << "\"" <<std::endl;
 }
+
+void OnReceive(const boost::system::error_code &err, client::StatusCode sc, client::CMessage::Ptr msg)
+{
+	std::cout << "the error code is " << err.value() << std::endl;
+	std::cout << "the times is \"" << times++ << "\"" << std::endl;
+
+	if (!err && sc == client::SC_ReadBody/*&& msg->body()[0]*/)
+	{
+		boost::shared_ptr<client::CMessage> request(new client::CMessage());
+		char str[client::CMessage::max_body_length];
+
+		msg->ReadBegin();
+		strncpy(str, msg->ReadString(), sizeof(str));
+		std::cout << "string: "<< str << std::endl;
+		char b = msg->ReadByte();
+		bool result = (b != -1) ? b : false;
+		std::cout << "bool:"<< result << std::endl;
+		int l = msg->ReadLong();
+		std::cout << "long:" << l << std::endl;
+		float f = msg->ReadFloat();
+		std::cout << "float:" << f << std::endl;
+		msg->ReadEnd();
+		
+
+		request->WriteBegin();
+		request->WriteString(str, strlen(str) + 1);
+		request->WriteByte(result);
+		request->WriteLong(l);
+		request->WriteEnd();
+		cli.PostSend(request, boost::bind(&OnSendComplete, _1, _2));
+	}
+}
+
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -59,19 +88,21 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::string host = "localhost";
 		std::string port = "60000";
 
-		client::CClient cli;
-
 		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 3);
 
 		while (true)
 		{
 			getchar();
-			char line[client::CMessage::max_body_length + 1] = "demo";
-			
+			char line[8] = "demo";
+
 			boost::shared_ptr<client::CMessage> msg(new client::CMessage());
-			msg->body_length(strlen(line));
-			memcpy(msg->body(), line, msg->body_length());
-			msg->encode_header();
+			
+			msg->WriteBegin();
+			msg->WriteString(line, strlen(line) + 1);
+			msg->WriteByte(true);
+			msg->WriteLong(10);
+			msg->WriteFloat(12.0);
+			msg->WriteEnd();
 
 			cli.PostSend(msg, boost::bind(&OnSendComplete, _1, _2));
 			Sleep( 10 );
