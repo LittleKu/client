@@ -46,7 +46,7 @@ update 2015/01/12
 
 注:代码注释还有待完善^_^
 
-off topic:
+off topic:^n
 // 使用协议：WTFPL
 // 鉴于在天朝神马协议都被无视，甚至很多大公司都不遵守，故索性采用了【DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE】协议~O(∩_∩)O~
 //
