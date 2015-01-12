@@ -21,6 +21,9 @@ namespace client
 	{
 		//初始化客户端连接所需信息
 		m_pClientImpl->Init(host, port, cb, thread_count, connection_count, connection_limit);
+		m_host = host;
+		m_port = port;
+		m_cbInit = cb;
 	}
 
 	void CClient::Stop()
@@ -33,5 +36,13 @@ namespace client
 	void CClient::PostSend(CMessage::Ptr msg, cb_Request cb)
 	{
 		m_pClientImpl->PostRequest(msg, cb);
+	}
+
+	void CClient::Reset()
+	{
+		if (m_host.c_str() && m_port.c_str() && m_cbInit)
+		{
+			Init(m_host, m_port, m_cbInit);
+		}
 	}
 }

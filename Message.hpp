@@ -1,6 +1,6 @@
 /****************************************
  * class	: CMessage
- * author	: http://www.boost.org/doc/libs/1_56_0/doc/html/boost_asio/example/cpp03/chat/chat_message.hpp
+ * author	: LittleKu (L.K)
  * email	: kklvzl@gmail.com
  * date		: 09-02-2014
  ****************************************/
@@ -23,7 +23,7 @@ namespace client
 		typedef boost::shared_ptr<CMessage> Ptr;
 
 		enum { header_length = 4 };
-		enum { max_body_length = 512 };
+		enum { max_body_length = 8188 };
 
 		CMessage()
 			: m_nBodyLength(0)
@@ -32,7 +32,7 @@ namespace client
 			::memset(m_rgData, 0, sizeof(m_rgData));
 		}
 
-		const char* GetData() const
+		const unsigned char* GetData() const
 		{
 			return m_rgData;
 		}
@@ -92,7 +92,7 @@ namespace client
 			if (m_nCursor + 2 > m_nBodyLength + header_length)
 				return -1;
 
-			::memcpy(&c, &m_rgData[m_nCursor], 2);
+			c = (short)(m_rgData[m_nCursor] + (m_rgData[m_nCursor + 1] << 8));
 			m_nCursor += 2;
 			return c;
 		}
@@ -103,7 +103,7 @@ namespace client
 			if (m_nCursor + 4 > m_nBodyLength + header_length)
 				return -1;
 
-			::memcpy(&c, &m_rgData[m_nCursor], 4);
+			c = m_rgData[m_nCursor] + (m_rgData[m_nCursor + 1] << 8) + (m_rgData[m_nCursor + 2] << 16) + (m_rgData[m_nCursor + 3] << 24);
 			m_nCursor += 4;
 			return c;
 		}
@@ -125,6 +125,15 @@ namespace client
 			return dat.f;
 		}
 
+		bool ReadBuf(size_t nSize, void *pBuf)
+		{
+			if (m_nCursor + nSize > m_nBodyLength + header_length)
+				return false;
+
+			::memcpy(pBuf, &m_rgData[m_nCursor], nSize);
+			return true;
+		}
+
 		/***********************************************************/
 		void WriteBegin()
 		{
@@ -135,27 +144,35 @@ namespace client
 		{
 			SetBodyLength(m_nCursor - header_length);
 
-			char header[header_length + 1] = "";
-			sprintf(header, "%4d", m_nBodyLength);
-			memcpy(m_rgData, header, header_length);
+			memcpy(m_rgData, &m_nBodyLength, header_length);
 
 			m_nCursor = 0;
 		}
 
-		bool WriteString(const char *str, size_t nSize)
+		bool WriteString(const char *str)
 		{
-			if (str == NULL)
-				return false;
-
-			return Write((void*)str, nSize);
+			if (!str)
+				return Write("", 1);
+			return Write(str, strlen(str) + 1);
 		}
 
-		bool WriteLong(int val)
+		bool WriteLong(int c)
 		{
-			return Write( &val, 4);
+			unsigned char *b = NULL;
+
+			b = (unsigned char *)GetSpace(4);
+			if (b != NULL)
+			{
+				b[0] = c & 0xff;
+				b[1] = (c >> 8) & 0xff;
+				b[2] = (c >> 16) & 0xff;
+				b[3] = c >> 24;
+				return true;
+			}
+			return false;
 		}
 
-		bool WriteFloat(float val)
+		bool WriteFloat(float f)
 		{
 			union
 			{
@@ -163,36 +180,53 @@ namespace client
 				int l;
 			}dat;
 
-			dat.f = val;
+			dat.f = f;
 			return Write(&dat.l, 4);
 		}
 
-		bool WriteShort(short val)
+		bool WriteShort(int val)
 		{
-			return Write(&val, 2);
+			unsigned char *b = NULL;
+			b = (unsigned char *)GetSpace(2);
+			if (b != NULL)
+			{
+				b[0] = (val & 0xFF);
+				b[1] = (val >> 8);
+				return true;
+			}
+			return false;
 		}
 
 		bool WriteByte(unsigned char val)
 		{
-			return Write((void*)&val, 1);
+			unsigned char *b = NULL;
+			b = (unsigned char *)GetSpace(1);
+			if (b != NULL)
+			{
+				b[0] = val;
+				return true;
+			}
+			return false;
 		}
-		
-		/*void operator = (const CMessage &srcMsg)
+
+		bool WriteBuf(size_t nSize, void *pBuf)
 		{
-			::memcpy(this->m_rgData, srcMsg.GetData(), srcMsg.GetLength());
-			this->m_nBodyLength = srcMsg.GetBodyLength();
-		}*/
+			if (!pBuf)
+				return false;
+
+			return Write(pBuf, nSize);
+		}
 
 	protected:
 
-		char* GetData(bool bReset)
+		unsigned char* GetData(bool bReset)
 		{
 			if (bReset)
 				::memset(m_rgData, 0, sizeof(m_rgData));
 			return m_rgData;
 		}
 
-		char* GetBody()
+		unsigned char* GetBody()
 		{
 			return m_rgData + header_length;
 		}
@@ -211,9 +245,8 @@ namespace client
 
 		bool DecodeHeader()
 		{
-			char header[header_length + 1] = "";
-			::memcpy(header, m_rgData, header_length);
-			m_nBodyLength = atoi(header);
+			::memcpy(&m_nBodyLength, m_rgData, header_length);
+			
 			if (m_nBodyLength > max_body_length)
 			{
 				m_nBodyLength = 0;
@@ -229,20 +262,34 @@ namespace client
 	private:
 		bool CheckSpace(size_t nSize)//¼ì²éÐ´¿Õ¼äÊÇ·ñ×ã¹»
 		{
-			if (max_body_length - m_nCursor < nSize)
+			if ((max_body_length + header_length) - m_nCursor < nSize)
 				return false;
 
 			return true;
 		}
 
+		void *GetSpace(size_t length)
+		{
+			void *d;
+
+			if (!CheckSpace(length))
+				return NULL;
+
+			d = m_rgData + m_nCursor;
+			m_nCursor += length;
+			return d;
+		}
+
 		bool Write(const void *pData, size_t nSize)
 		{
-			if (!CheckSpace(nSize))
-				return false;
-
-			::memcpy(&m_rgData[m_nCursor], pData, nSize);
-			m_nCursor += nSize;
-			return true;
+			unsigned char *b = NULL;
+			b = (unsigned char*)GetSpace(nSize);
+			if (b != NULL)
+			{
+				::memcpy(b, pData, nSize);
+				return true;
+			}
+			return false;
 		}
 	};
 }

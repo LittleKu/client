@@ -180,9 +180,15 @@ namespace client
 			}
 			else
 			{
+				boost::system::error_code error;
+				error = err;
+				if (!err)
+				{
+					error = boost::asio::error::message_size;
+				}
 				//报错,连接池通知CConnectionPool::QueueConnection,非连接池通知自定义回调函数
-				boost::get<0>(handler)(err, SC_ReadHeader, m_Response);
-				std::cout<< err.message() << std::endl;
+				boost::get<0>(handler)(error, SC_ReadHeader, m_Response);
+				//std::cout<< error.message() << std::endl;
 			}
 		}
 

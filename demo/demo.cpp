@@ -40,7 +40,12 @@ client::CClient cli;
 
 void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr msg)
 {
-	std::cout << err.value() << std::endl;
+	std::cout << "ErrorCode" << err.value() << std::endl;
+	if (err.value() == boost::asio::error::not_connected)
+	{
+		cli.Reset();
+		return;
+	}
 	std::cout << "OnSendComplete" << std::endl;
 	std::cout << "OnSendComplete times \"" << times++ << "\"" <<std::endl;
 }
@@ -69,7 +74,7 @@ void OnReceive(const boost::system::error_code &err, client::StatusCode sc, clie
 		
 
 		request->WriteBegin();
-		request->WriteString(str, strlen(str) + 1);
+		request->WriteString(str);
 		request->WriteByte(result);
 		request->WriteLong(l);
 		request->WriteEnd();
@@ -83,12 +88,12 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	try
 	{
-		printf ( "Hello, world!\n" );
+		printf ( "Hello, Boost !!!\n" );
 
 		std::string host = "localhost";
 		std::string port = "60000";
 
-		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 3);
+		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 4);
 
 		while (true)
 		{
@@ -98,10 +103,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			boost::shared_ptr<client::CMessage> msg(new client::CMessage());
 			
 			msg->WriteBegin();
-			msg->WriteString(line, strlen(line) + 1);
+			msg->WriteString(line);
 			msg->WriteByte(true);
 			msg->WriteLong(10);
 			msg->WriteFloat(12.0);
+			msg->WriteString(line);
 			msg->WriteEnd();
 
 			cli.PostSend(msg, boost::bind(&OnSendComplete, _1, _2));

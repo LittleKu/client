@@ -30,9 +30,12 @@ namespace client
 		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count = 1, int connection_count = 1, int connection_limit = 5);
 		void Stop();
 		void PostSend(CMessage::Ptr msg, cb_Request cb);
-
+		void Reset();
 	private:
 		boost::shared_ptr<CClientImpl> m_pClientImpl;
+		cb_InitConnection m_cbInit;
+		std::string m_host;
+		std::string m_port;
 	};
 }
 
