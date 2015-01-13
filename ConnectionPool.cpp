@@ -205,9 +205,11 @@ namespace client
 		}
 	}
 
+	//尝试从有效连接列表中取出空闲的connection
 	void CConnectionPool::GetConnection(cb_addConnection cb)
 	{
 		boost::mutex::scoped_lock lock(m_Mutex);
+		//有直接可用的空闲connection
 		if (!m_ListValid.empty())
 		{
 			CConnection::Ptr connection = m_ListValid.front();
@@ -215,12 +217,18 @@ namespace client
 			
 			m_ListRun.push_back(connection);
 			boost::system::error_code error;
+			
+			/*通知回调,并在回调中回收connection
+			void CClientImpl::ProcessRequest(CMessage::Ptr msg, cb_Request cb,const boost::system::error_code &err, CConnection::Ptr connection)*/
 			m_Io_Service.post(boost::bind(cb, error, connection));
 		}
+		//否则
 		else
 		{
+			//先行保存请求回调
 			m_DequeRequest.push_back(cb);
 
+			//设置定时器,一定时间后再重新检测
 			int res = m_TryTimer.expires_from_now(boost::posix_time::seconds(m_TimeoutRequest));
 			if (!res)
 			{
@@ -229,6 +237,7 @@ namespace client
 		}
 	}
 
+	//再次检测并提取有效的connection
 	void CConnectionPool::CheckAvaliableConnection(const boost::system::error_code &err)
 	{
 		bool aborted = (err == boost::asio::error::operation_aborted) ? true : false;
@@ -240,25 +249,31 @@ namespace client
 		CConnection::Ptr connection;
 		boost::system::error_code error;
 
+		//请求序列不为空
 		if (!m_DequeRequest.empty())
 		{
 			cb_addConnection cb = m_DequeRequest.front();
 			m_DequeRequest.pop_front();
 
+			//再次尝试获取空闲的connection
 			if (!m_ListValid.empty())
 			{
 				connection = m_ListValid.front();
 				m_ListValid.pop_front();
 				m_ListRun.push_back(connection);
 			}
+			//没能再次获取到空闲的连接对象
 			else
 			{
 				error = boost::asio::error::not_connected;
 			}
+			/*通知回调,并在回调中回收connection
+			void CClientImpl::ProcessRequest(CMessage::Ptr msg, cb_Request cb,const boost::system::error_code &err, CConnection::Ptr connection)*/
 			m_Io_Service.post(boost::bind(cb, error, connection));
 		}
 	}
 
+	//连接失败,重新创建新的connection
 	void CConnectionPool::TimeoutNewConnection(const boost::system::error_code &err, cb_InitConnection cb)
 	{
 		//连接超时,如果是因为用户终止连接,那么就直接返回
@@ -269,6 +284,7 @@ namespace client
 		//否则就清除尝试连接基数,重新再尝试连接
 		boost::mutex::scoped_lock lock(m_Mutex);
 
+		//投递一个重新创建新的connection
 		m_TryConnect = 0;
 		m_Io_Service.post(boost::bind(&CConnectionPool::NewConnection, shared_from_this(), cb));
 	}
