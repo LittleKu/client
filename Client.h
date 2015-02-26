@@ -8,6 +8,8 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
+#pragma once
+
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>

@@ -8,6 +8,8 @@
 #ifndef __CONNECTION_POOL_H__
 #define __CONNECTION_POOL_H__
 
+#pragma once
+
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
@@ -20,7 +22,7 @@
 #include <iostream>
 
 #include "Connection.h"
-#include "Message.hpp"
+#include "Message.h"
 
 namespace client
 {

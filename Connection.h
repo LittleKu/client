@@ -21,7 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 
-#include "Message.hpp"
+#include "Message.h"
 
 
 

@@ -168,6 +168,10 @@
 				RelativePath="..\ConnectionPool.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\Message.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -191,7 +195,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Message.hpp"
+				RelativePath="..\Message.h"
 				>
 			</File>
 		</Filter>

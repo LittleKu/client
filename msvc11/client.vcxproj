@@ -15,13 +15,14 @@
     <ClInclude Include="..\ClientImpl.h" />
     <ClInclude Include="..\Connection.h" />
     <ClInclude Include="..\ConnectionPool.h" />
-    <ClInclude Include="..\Message.hpp" />
+    <ClInclude Include="..\Message.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Client.cpp" />
     <ClCompile Include="..\ClientImpl.cpp" />
     <ClCompile Include="..\Connection.cpp" />
     <ClCompile Include="..\ConnectionPool.cpp" />
+    <ClCompile Include="..\Message.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B65CBB8E-EACF-4E1C-BF06-629A6900D709}</ProjectGuid>
