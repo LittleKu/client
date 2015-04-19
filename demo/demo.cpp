@@ -77,6 +77,8 @@ void OnReceive(const boost::system::error_code &err, client::StatusCode sc, clie
 		request->WriteString(str);
 		request->WriteByte(result);
 		request->WriteLong(l);
+		request->WriteFloat(f);
+		request->WriteString(str);
 		request->WriteEnd();
 		cli.PostSend(request, boost::bind(&OnSendComplete, _1, _2));
 	}
@@ -90,10 +92,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		printf ( "Hello, Boost !!!\n" );
 
-		std::string host = "localhost";
-		std::string port = "60000";
+		std::string host = "192.168.199.125";
+		std::string port = "81";
 
-		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 4);
+		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 1);
 
 		while (true)
 		{
