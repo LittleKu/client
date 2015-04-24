@@ -23,7 +23,7 @@
     <ClInclude Include="..\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Message.h">
+    <ClInclude Include="..\msgbuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -40,7 +40,7 @@
     <ClCompile Include="..\Client.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
-    <ClCompile Include="..\Message.cpp">
+    <ClCompile Include="..\msgbuffer.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
   </ItemGroup>

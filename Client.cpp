@@ -33,7 +33,7 @@ namespace client
 	}
 
 	//向服务端发送信息
-	void CClient::PostSend(CMessage::Ptr msg, cb_Request cb)
+	void CClient::PostSend(CMsgBuffer::Ptr msg, cb_Request cb)
 	{
 		m_pClientImpl->PostRequest(msg, cb);
 	}

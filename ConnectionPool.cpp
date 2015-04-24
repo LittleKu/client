@@ -109,7 +109,7 @@ namespace client
 	}
 
 	//async_resolve,async_connect,async_read,async_write成功与否,都会调用此函数作为回调函数,并传递错误代码及数据包
-	void CConnectionPool::QueueConnection(const boost::system::error_code &err, StatusCode sc, CMessage::Ptr msg, cb_InitConnection cb, CConnection::Ptr connection)
+	void CConnectionPool::QueueConnection(const boost::system::error_code &err, StatusCode sc, CMsgBuffer::Ptr msg, cb_InitConnection cb, CConnection::Ptr connection)
 	{
 		boost::mutex::scoped_lock lock(m_Mutex);
 

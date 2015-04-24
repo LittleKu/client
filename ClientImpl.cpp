@@ -65,7 +65,7 @@ namespace client
 		}
 	}
 
-	void CClientImpl::PostRequest(CMessage::Ptr msg, cb_Request cb)
+	void CClientImpl::PostRequest(CMsgBuffer::Ptr msg, cb_Request cb)
 	{
 		//先通过CConnectionPool::GetConnection获取到有效的连接对象
 		//如果获取失败,先把发送请求保存到待发送队列中,
@@ -74,7 +74,7 @@ namespace client
 		m_pPool->GetConnection(boost::bind(&CClientImpl::ProcessRequest, shared_from_this(), msg, cb, _1, _2));
 	}
 
-	void CClientImpl::ProcessRequest(CMessage::Ptr msg, cb_Request cb,const boost::system::error_code &err, CConnection::Ptr connection)
+	void CClientImpl::ProcessRequest(CMsgBuffer::Ptr msg, cb_Request cb, const boost::system::error_code &err, CConnection::Ptr connection)
 	{
 		//正常流程
 		if (connection && !err)
@@ -110,7 +110,7 @@ namespace client
 		}
 	}
 
-	void CClientImpl::CompleteRequest(cb_Request cb, const boost::system::error_code &err, CMessage::Ptr msg)
+	void CClientImpl::CompleteRequest(cb_Request cb, const boost::system::error_code &err, CMsgBuffer::Ptr msg)
 	{
 		//直接反应给用户层的回调函数,如Demo中的OnSendComplete
 		cb(err, msg);

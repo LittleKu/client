@@ -22,7 +22,7 @@
 
 namespace client
 {
-	typedef boost::function2<void, const boost::system::error_code &, CMessage::Ptr> cb_Request;
+	typedef boost::function2<void, const boost::system::error_code &, CMsgBuffer::Ptr> cb_Request;
 
 	class CClientImpl
 		: public boost::enable_shared_from_this<CClientImpl>,
@@ -36,13 +36,13 @@ namespace client
 
 		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count, int connection_count, int connection_limit);
 		void Stop();
-		void PostRequest(CMessage::Ptr msg, cb_Request cb);
+		void PostRequest(CMsgBuffer::Ptr msg, cb_Request cb);
 
 	protected:
 		std::size_t run();
 
-		void ProcessRequest(CMessage::Ptr msg, cb_Request cb, const boost::system::error_code &err, CConnection::Ptr connection);
-		void CompleteRequest(cb_Request cb, const boost::system::error_code &err, CMessage::Ptr msg);
+		void ProcessRequest(CMsgBuffer::Ptr msg, cb_Request cb, const boost::system::error_code &err, CConnection::Ptr connection);
+		void CompleteRequest(cb_Request cb, const boost::system::error_code &err, CMsgBuffer::Ptr msg);
 
 	private:
 		boost::mutex m_Mutex;

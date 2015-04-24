@@ -38,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 int times = 0;
 client::CClient cli;
 
-void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr msg)
+void OnSendComplete(const boost::system::error_code &err, CMsgBuffer::Ptr msg)
 {
 	std::cout << "ErrorCode" << err.value() << std::endl;
 	if (err.value() == boost::asio::error::not_connected)
@@ -50,17 +50,17 @@ void OnSendComplete(const boost::system::error_code &err, client::CMessage::Ptr 
 	std::cout << "OnSendComplete times \"" << times++ << "\"" <<std::endl;
 }
 
-void OnReceive(const boost::system::error_code &err, client::StatusCode sc, client::CMessage::Ptr msg)
+void OnReceive(const boost::system::error_code &err, client::StatusCode sc, CMsgBuffer::Ptr msg)
 {
 	std::cout << "the error code is " << err.value() << std::endl;
 	std::cout << "the times is \"" << times++ << "\"" << std::endl;
 
 	if (!err && sc == client::SC_ReadBody/*&& msg->body()[0]*/)
 	{
-		boost::shared_ptr<client::CMessage> request(new client::CMessage());
-		char str[client::CMessage::max_body_length];
+		//CMsgBuffer::Ptr request(new CMsgBuffer());
+		char str[128];
 
-		msg->ReadBegin();
+		int size = msg->ReadLong();
 		strncpy(str, msg->ReadString(), sizeof(str));
 		std::cout << "string: "<< str << std::endl;
 		char b = msg->ReadByte();
@@ -70,17 +70,15 @@ void OnReceive(const boost::system::error_code &err, client::StatusCode sc, clie
 		std::cout << "long:" << l << std::endl;
 		float f = msg->ReadFloat();
 		std::cout << "float:" << f << std::endl;
-		msg->ReadEnd();
 		
 
-		request->WriteBegin();
-		request->WriteString(str);
+		/*request->WriteString(str);
 		request->WriteByte(result);
 		request->WriteLong(l);
 		request->WriteFloat(f);
 		request->WriteString(str);
-		request->WriteEnd();
-		cli.PostSend(request, boost::bind(&OnSendComplete, _1, _2));
+
+		cli.PostSend(request, boost::bind(&OnSendComplete, _1, _2));*/
 	}
 }
 
@@ -92,7 +90,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		printf ( "Hello, Boost !!!\n" );
 
-		std::string host = "192.168.199.125";
+		std::string host = "localhost";
 		std::string port = "81";
 
 		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 1);
@@ -102,9 +100,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			getchar();
 			char line[8] = "demo";
 
-			boost::shared_ptr<client::CMessage> msg(new client::CMessage());
+			CMsgBuffer::Ptr msg(new CMsgBuffer());
 			
-			msg->WriteBegin();
 			msg->WriteString(line);
 			msg->WriteByte(true);
 			msg->WriteLong(10);

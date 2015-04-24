@@ -22,13 +22,13 @@
 #include <iostream>
 
 #include "Connection.h"
-#include "Message.h"
+#include "msgbuffer.h"
 
 namespace client
 {
 	class CClientImpl;
 
-	typedef boost::function3<void, const boost::system::error_code &, StatusCode, CMessage::Ptr> cb_InitConnection;
+	typedef boost::function3<void, const boost::system::error_code &, StatusCode, CMsgBuffer::Ptr> cb_InitConnection;
 	typedef boost::function2<void, const boost::system::error_code &, CConnection::Ptr> cb_addConnection;
 
 	class CConnectionPool
@@ -47,7 +47,7 @@ namespace client
 		void Stop();
 		void GetConnection(cb_addConnection cb);
 	private:
-		void QueueConnection(const boost::system::error_code &err, StatusCode sc, CMessage::Ptr msg, cb_InitConnection cb, CConnection::Ptr connection);
+		void QueueConnection(const boost::system::error_code &err, StatusCode sc, CMsgBuffer::Ptr msg, cb_InitConnection cb, CConnection::Ptr connection);
 		void NewConnection(cb_InitConnection cb);
 		void CheckAvaliableConnection(const boost::system::error_code &err);
 		void TimeoutNewConnection(const boost::system::error_code &err, cb_InitConnection cb);

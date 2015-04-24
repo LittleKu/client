@@ -5,4 +5,4 @@
  ****************************************/
 
 #include "Connection.h"
-#include "Message.h"
+#include "msgbuffer.h"
