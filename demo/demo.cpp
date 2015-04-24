@@ -98,18 +98,21 @@ int _tmain(int argc, _TCHAR* argv[])
 		while (true)
 		{
 			getchar();
-			char line[8] = "demo";
+			if (cli.IsConnected())
+			{
+				char line[8] = "demo";
 
-			CMsgBuffer::Ptr msg(new CMsgBuffer());
-			
-			msg->WriteString(line);
-			msg->WriteByte(true);
-			msg->WriteLong(10);
-			msg->WriteFloat(12.0);
-			msg->WriteString(line);
-			msg->WriteEnd();
+				CMsgBuffer::Ptr msg(new CMsgBuffer());
 
-			cli.PostSend(msg, boost::bind(&OnSendComplete, _1, _2));
+				msg->WriteString(line);
+				msg->WriteByte(true);
+				msg->WriteLong(10);
+				msg->WriteFloat(12.0);
+				msg->WriteString(line);
+				msg->WriteEnd();
+
+				cli.PostSend(msg, boost::bind(&OnSendComplete, _1, _2));
+			}
 			Sleep( 10 );
 		}
 

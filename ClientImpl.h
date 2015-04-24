@@ -37,6 +37,7 @@ namespace client
 		void Init(const std::string &host, const std::string &port, cb_InitConnection cb, int thread_count, int connection_count, int connection_limit);
 		void Stop();
 		void PostRequest(CMsgBuffer::Ptr msg, cb_Request cb);
+		bool HasValidConnection();
 
 	protected:
 		std::size_t run();

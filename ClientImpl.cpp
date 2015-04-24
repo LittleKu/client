@@ -65,6 +65,11 @@ namespace client
 		}
 	}
 
+	bool CClientImpl::HasValidConnection()
+	{
+		return m_pPool->HasValidConnect();
+	}
+
 	void CClientImpl::PostRequest(CMsgBuffer::Ptr msg, cb_Request cb)
 	{
 		//先通过CConnectionPool::GetConnection获取到有效的连接对象

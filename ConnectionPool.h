@@ -51,6 +51,7 @@ namespace client
 		void NewConnection(cb_InitConnection cb);
 		void CheckAvaliableConnection(const boost::system::error_code &err);
 		void TimeoutNewConnection(const boost::system::error_code &err, cb_InitConnection cb);
+		bool HasValidConnect();
 	private:
 		boost::mutex m_Mutex;
 		std::string m_Host;

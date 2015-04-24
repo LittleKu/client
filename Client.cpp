@@ -45,4 +45,9 @@ namespace client
 			Init(m_host, m_port, m_cbInit);
 		}
 	}
+
+	bool CClient::IsConnected()
+	{
+		return m_pClientImpl->HasValidConnection();
+	}
 }

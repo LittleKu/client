@@ -288,4 +288,13 @@ namespace client
 		m_TryConnect = 0;
 		m_Io_Service.post(boost::bind(&CConnectionPool::NewConnection, shared_from_this(), cb));
 	}
+
+	bool CConnectionPool::HasValidConnect()
+	{
+		boost::mutex::scoped_lock l(m_Mutex);
+		if (!m_ListValid.empty() && m_ListValid.front()->IsOpen())
+			return true;
+
+		return false;
+	}
 }

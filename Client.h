@@ -33,6 +33,7 @@ namespace client
 		void Stop();
 		void PostSend(CMsgBuffer::Ptr msg, cb_Request cb);
 		void Reset();
+		bool IsConnected();
 	private:
 		boost::shared_ptr<CClientImpl> m_pClientImpl;
 		cb_InitConnection m_cbInit;
