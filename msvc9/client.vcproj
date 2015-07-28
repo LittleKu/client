@@ -18,9 +18,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\lib"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			OutputDirectory="..\output/"
+			IntermediateDirectory="..\output/"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,11 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				FavorSizeOrSpeed="0"
 				AdditionalIncludeDirectories="&quot;$(BOOST)\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WIN32_WINNT=0x0501"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -60,11 +61,14 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				AdditionalLibraryDirectories=""
+				Name="VCLinkerTool"
+				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -76,16 +80,19 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			OutputDirectory="..\output/"
+			IntermediateDirectory="..\output/"
+			ConfigurationType="1"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -105,10 +112,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				EnableIntrinsicFunctions="true"
+				EnableIntrinsicFunctions="false"
 				AdditionalIncludeDirectories="&quot;$(BOOST)\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WIN32_WINNT=0x0501"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -125,10 +132,14 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -140,6 +151,9 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -148,56 +162,72 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="demo"
 			>
 			<File
-				RelativePath="..\Client.cpp"
+				RelativePath="..\demo.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\ClientImpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Connection.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\ConnectionPool.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Message.cpp"
+				RelativePath="..\demo.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="client"
 			>
-			<File
-				RelativePath="..\Client.h"
+			<Filter
+				Name="Source Files"
+				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+				UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 				>
-			</File>
-			<File
-				RelativePath="..\ClientImpl.h"
+				<File
+					RelativePath="..\Client.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\ClientImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Connection.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\ConnectionPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\msgbuffer.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Header Files"
+				Filter="h;hpp;hxx;hm;inl;inc;xsd"
+				UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 				>
-			</File>
-			<File
-				RelativePath="..\Connection.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ConnectionPool.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Message.h"
-				>
-			</File>
+				<File
+					RelativePath="..\Client.h"
+					>
+				</File>
+				<File
+					RelativePath="..\ClientImpl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Connection.h"
+					>
+				</File>
+				<File
+					RelativePath="..\ConnectionPool.h"
+					>
+				</File>
+				<File
+					RelativePath="..\msgbuffer.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
