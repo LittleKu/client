@@ -1,8 +1,12 @@
 // demo.cpp : 定义控制台应用程序的入口点。
 //
 
-#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <cstdlib>
+#include <iostream>
 
+#include "Client.h"
 
 /*void callback_connection(const boost::system::error_code& err, client::CMessage::Ptr msg)
 {
@@ -10,7 +14,7 @@
 		std::cout << "something is work fine" << err.value() << std::endl;
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int main()
 {
 	try
 	{
@@ -64,7 +68,7 @@ void OnReceive(const boost::system::error_code &err, client::StatusCode sc, CMsg
 		strncpy(str, msg->ReadString(), sizeof(str));
 		std::cout << "string: "<< str << std::endl;
 		char b = msg->ReadByte();
-		bool result = (b != -1) ? b : false;
+		bool result = (b != -1) ? true : false;
 		std::cout << "bool:"<< result << std::endl;
 		int l = msg->ReadLong();
 		std::cout << "long:" << l << std::endl;
@@ -84,14 +88,14 @@ void OnReceive(const boost::system::error_code &err, client::StatusCode sc, CMsg
 
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int main()
 {
 	try
 	{
 		printf ( "Hello, Boost !!!\n" );
 
-		std::string host = "localhost";
-		std::string port = "81";
+		std::string host = "192.168.1.70";
+		std::string port = "60000";
 
 		cli.Init( host, port, boost::bind(&OnReceive, _1, _2, _3), 1, 1);
 
@@ -113,7 +117,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 				cli.PostSend(msg, boost::bind(&OnSendComplete, _1, _2));
 			}
+#ifdef WIN32
 			Sleep( 10 );
+#else
+			usleep( 10 * 1000);
+#endif
 		}
 
 	}

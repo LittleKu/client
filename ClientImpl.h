@@ -52,7 +52,7 @@ namespace client
 
 		boost::shared_ptr<CConnectionPool> m_pPool;
 
-		std::vector<boost::shared_ptr<boost::thread>> m_ListThread;
+		std::vector< boost::shared_ptr<boost::thread> > m_ListThread;
 	};
 }
 

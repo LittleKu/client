@@ -1,47 +1,59 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
+    <Filter Include="client">
+      <UniqueIdentifier>{c9379a96-f507-426e-b3be-85d4e83859bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="client\Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source FIles">
+    <Filter Include="client\Source FIles">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="demo">
+      <UniqueIdentifier>{6f7f9318-a29d-45ac-91c6-a605e5566b1e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Connection.h">
-      <Filter>Header Files</Filter>
+      <Filter>client\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\ConnectionPool.h">
-      <Filter>Header Files</Filter>
+      <Filter>client\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\ClientImpl.h">
-      <Filter>Header Files</Filter>
+      <Filter>client\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Client.h">
-      <Filter>Header Files</Filter>
+      <Filter>client\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\msgbuffer.h">
-      <Filter>Header Files</Filter>
+      <Filter>client\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\demo.h">
+      <Filter>demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Connection.cpp">
-      <Filter>Source FIles</Filter>
+      <Filter>client\Source FIles</Filter>
     </ClCompile>
     <ClCompile Include="..\ConnectionPool.cpp">
-      <Filter>Source FIles</Filter>
+      <Filter>client\Source FIles</Filter>
     </ClCompile>
     <ClCompile Include="..\ClientImpl.cpp">
-      <Filter>Source FIles</Filter>
+      <Filter>client\Source FIles</Filter>
     </ClCompile>
     <ClCompile Include="..\Client.cpp">
-      <Filter>Source FIles</Filter>
+      <Filter>client\Source FIles</Filter>
     </ClCompile>
     <ClCompile Include="..\msgbuffer.cpp">
-      <Filter>Source FIles</Filter>
+      <Filter>client\Source FIles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\demo.cpp">
+      <Filter>demo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

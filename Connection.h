@@ -37,7 +37,7 @@ namespace client
 		SC_Send,
 	};
 
-	enum PSize
+	enum
 	{
 		SIZE_MESSAGE = 8192,
 		SIZE_HEADER = 4,
@@ -50,32 +50,14 @@ namespace client
 	public:
 		typedef boost::shared_ptr<CConnection> Ptr;
 	public:
-		CConnection(boost::asio::io_service &io_service)
-			:m_ioService(io_service),
-			m_Resolver(io_service),
-			m_Socket(io_service)
-		{
-			m_pMsgBuffer.reset(new CMsgBuffer());
-			m_pMsgBuffer->Clear();
-
-			::memset(m_rgData, 0, sizeof(m_rgData));
-			m_nBodyLength = 0;
-		}
-		~CConnection()
-		{
-		}
+		CConnection(boost::asio::io_service &io_service);
+		~CConnection();
 
 		//关闭连接
-		void Close()
-		{
-			m_Socket.close();
-		}
+		void Close();
 
 		//连接是否已经打开
-		bool IsOpen() const
-		{
-			return m_Socket.is_open();
-		}
+		bool IsOpen() const;
 
 		//投递一个发送信息的请求
 		template <typename Handler>
@@ -118,7 +100,7 @@ namespace client
 		boost::asio::ip::tcp::socket m_Socket;
 		boost::asio::ip::tcp::resolver m_Resolver;
 
-		unsigned char m_rgData[PSize::SIZE_MESSAGE];
+		unsigned char m_rgData[SIZE_MESSAGE];
 		unsigned int m_nBodyLength;
 		CMsgBuffer::Ptr m_pMsgBuffer;
 
@@ -152,8 +134,8 @@ namespace client
 				
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 				
-				//投递 PSize::SIZE_HEADER(4) 字节大小尝试接收数据包头部
-				boost::asio::async_read(m_Socket, boost::asio::buffer(m_rgData, PSize::SIZE_HEADER), boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
+				//投递 SIZE_HEADER(4) 字节大小尝试接收数据包头部
+				boost::asio::async_read(m_Socket, boost::asio::buffer(m_rgData, SIZE_HEADER), boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
 			}
 			else if (endpoint_iterator != boost::asio::ip::tcp::resolver::iterator())
 			{
@@ -178,13 +160,13 @@ namespace client
 			//正常接收到数据,并且能正确转换为数据包头部数据
 			if (!err)
 			{
-				::memcpy(&m_nBodyLength, m_rgData, PSize::SIZE_HEADER);
+				::memcpy(&m_nBodyLength, m_rgData, SIZE_HEADER);
 
-				if (m_nBodyLength > 0 && m_nBodyLength <= PSize::SIZE_MESSAGE - PSize::SIZE_HEADER)
+				if (m_nBodyLength > 0 && m_nBodyLength <= SIZE_MESSAGE - SIZE_HEADER)
 				{
 					void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Body < Handler > ;
 					//根据解密得到的数据包大小投递接收数据包
-					boost::asio::async_read(m_Socket, boost::asio::buffer(&m_rgData[PSize::SIZE_HEADER], m_nBodyLength), boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
+					boost::asio::async_read(m_Socket, boost::asio::buffer(&m_rgData[SIZE_HEADER], m_nBodyLength), boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
 				}
 			}
 			else
@@ -210,14 +192,14 @@ namespace client
 				//连接池通知CConnectionPool::QueueConnection,非连接池通知自定义回调函数
 
 				m_pMsgBuffer->Clear();
-				m_pMsgBuffer->WriteBuf(PSize::SIZE_HEADER + m_nBodyLength, m_rgData);
+				m_pMsgBuffer->WriteBuf(SIZE_HEADER + m_nBodyLength, m_rgData);
 
 				boost::get<0>(handler)(err, SC_ReadBody, m_pMsgBuffer);
 
 				void (CConnection::*f)(const boost::system::error_code &, boost::tuple<Handler>) = &CConnection::Handle_Read_Header<Handler>;
 
 				//接收完一个数据包后,当然得继续投递,接收一下个数据包如此无限循环
-				boost::asio::async_read(m_Socket, boost::asio::buffer(m_rgData, PSize::SIZE_HEADER), boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
+				boost::asio::async_read(m_Socket, boost::asio::buffer(m_rgData, SIZE_HEADER), boost::bind(f, shared_from_this(), boost::asio::placeholders::error, handler));
 			}
 			else
 			{
